@@ -2,8 +2,8 @@
 //************************************************************//
 //************************************************************//
 //************** Alumno (s): *********************************//
-//********************** GALVÁN HERNÁNDEZ KARINA *************//
-//********************** VISUAL STUDIO 2017 ******************//
+//******************** GALVÁN HERNÁNDEZ KARINA ***************//
+//******************** VISUAL STUDIO 2017 ********************//
 //************************************************************//
 #include "Main.h"
 
@@ -35,28 +35,39 @@ int satelite2 = 0;
 float camaraZ = 0.0;
 float camaraX = 0.0;
 
+GLfloat SolDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };			// Diffuse Light Values
+GLfloat SolSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
+GLfloat SolPosition[] = { 0.0f, 0.0f, 0.0f, 1.0f };			// Light Position
 
-GLfloat SunDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };			// Diffuse Light Values
-GLfloat SunSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
-GLfloat SunPosition[] = { 0.0f, 0.0f, 0.0f, 1.0f };			// Light Position
+GLfloat MercurioDiffuse[] = { 2.0f, 2.0f, 2.0f, 1.0f };	// Mercurio
+GLfloat MercurioSpecular[] = { 3.0, 3.5, 3.5, 1.0 };
+GLfloat MercurioShininess[] = { 50.0 };
 
-GLfloat EarthDiffuse[] = { 0.2f, 0.2f, 1.0f, 1.0f };			// Tierra
-GLfloat EarthSpecular[] = { 0.8, 0.8, 0.8, 1.0 };
-GLfloat EarthShininess[] = { 50.0 };
+GLfloat VenusDiffuse[] = { 0.7f, 0.7f, 2.5f, 1.0f };	// Venus
+GLfloat VenusSpecular[] = { 2.0, 2.5, 2.5, 1.0 };
+GLfloat VenusShininess[] = { 50.0 };
 
-GLfloat MoonDiffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };			// Luna
-GLfloat MoonSpecular[] = { 1.0, 1.0, 1.0, 1.0 };
-GLfloat MoonShininess[] = { 50.0 };
+GLfloat TierraDiffuse[] = { 0.2f, 0.2f, 1.0f, 1.0f };	// Tierra
+GLfloat TierraSpecular[] = { 0.3, 0.3, 0.3, 1.0 };
+GLfloat TierraShininess[] = { 50.0 };
 
-GLfloat MarsDiffuse[] = { 0.8f, 0.4f, 0.1f, 1.0f };			// Marte
-GLfloat MarsSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
-GLfloat MarsShininess[] = { 50.0 };
+GLfloat ConejoDiffuse[] = { 0.5f, 0.5f, 0.5f, 1.0f };	// Luna (Conejo)
+GLfloat ConejoSpecular[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat ConejoShininess[] = { 50.0 };
 
+GLfloat MarteDiffuse[] = { 0.9f, 0.5f, 0.1f, 1.0f };	// Marte
+GLfloat MarteSpecular[] = { 1.0, 0.5, 0.0, 1.0 };
+GLfloat MarteShininess[] = { 50.0 };
 
 
 void InitGL(GLvoid)     // Inicializamos parametros
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
+
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, SolDiffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, SolDiffuse);
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
 	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
@@ -71,31 +82,39 @@ void display(void)   // Creamos la funcion donde se dibuja
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	glTranslatef(camaraX, 0.0, -5.0 + camaraZ);			//camara
+	glTranslatef(camaraX, 0.0, -5.0 + camaraZ);	
 
 
-	glPushMatrix(); //sistema solar
-	glRotatef(sol, 0.0, 1.0, 0.0);	//El Sol gira sobre su eje
+	glPushMatrix();//sol
 	glPushMatrix();
-	glColor3f(1.0, 1.0, 0.0);	//Sol amarillo
-	glutSolidSphere(1.9, 20, 20);  //Draw Sun (radio,H,V);
-	glPopMatrix();
-	glPopMatrix();
+	glRotatef(sol, 0.0, 1.0, 0.0);	
+	glColor3f(1.0, 1.0, 0.0);	
+	glLightfv(GL_LIGHT1, GL_POSITION, SolPosition);
+	glDisable(GL_LIGHTING);
+	glutSolidSphere(1.9, 20, 20);  
+	glEnable(GL_LIGHTING);
 
-	glPushMatrix(); //mercurio
-	glRotatef(sol, 0, 1, 0);
+	
+	glPushMatrix();//Mercurio
+	glRotated(sol, 0, 1, 0);
 	glTranslatef(3.2, 0, 0);
-	glRotatef(mercurio, 0, 1, 0); //(45,1,0,0)
-	glColor3f(2.0, 0.5, 1.0);
-	glutSolidSphere(0.3, 20, 20); //los dos ultimos numeros mientras mas grandes mas esferico se volver el cuerpo
+	glColor3f(2, 0.5, 1);
+	glRotated(mercurio, 0, 1, 0);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, MercurioDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, MercurioSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, MercurioShininess);
+	glutSolidSphere(0.3, 20, 20);
 	glPopMatrix();
 
-	glPushMatrix(); //venus
-	glRotatef(sol, 0, 1, 0);
+	glPushMatrix();//venus
+	glRotated(sol, 0, 1, 0);
 	glTranslatef(5.5, 0, 0);
-	glRotatef(venus, 0, 1, 0); //(45,1,0,0)
-	glColor3f(0.37, 0.56, 0.56);
-	glutSolidSphere(0.4, 20, 20); //primer variable indica el tamano, los dos ultimos numeros mientras mas grandes mas esferico se volver el cuerpo
+	glColor3f(0.37 ,0.56,0.56); 
+	glRotated(venus, 0, 2, 0);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, VenusDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, VenusSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, VenusShininess);
+	glutSolidSphere(0.4, 20, 20);
 	glPopMatrix();
 
 	glPushMatrix(); //tierra
@@ -103,15 +122,21 @@ void display(void)   // Creamos la funcion donde se dibuja
 	glTranslatef(7.7, 0, 0);
 	glRotatef(tierra, 0, 1, 0);
 	glColor3f(0.0, 0.5, 1.0);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, TierraDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, TierraSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, TierraShininess);
 	glutSolidSphere(0.6, 20, 20);
 	glPopMatrix();
 
 	glPushMatrix(); //conejo
 	glRotatef(tierra, 0, 1, 0);
 	glTranslatef(8.7, 0, 0);
-	glRotatef(tierra, 0, 1, 0); 
+	glRotatef(tierra, 0, 1, 0);
 	glColor3f(0.7, 0.7, 0.7);
-	glutSolidSphere(0.2, 20, 20); 
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, ConejoDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, ConejoSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, ConejoShininess);
+	glutSolidSphere(0.2, 20, 20);
 	glPopMatrix();
 
 	glPopMatrix();
@@ -121,15 +146,18 @@ void display(void)   // Creamos la funcion donde se dibuja
 	glTranslatef(11.5, 0, 0);
 	glRotatef(marte, 0, 1, 0);
 	glColor3f(1.0, 0, 0);
-	glutSolidSphere(0.5, 20, 20); 
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, MarteDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, MarteSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, MarteShininess);
+	glutSolidSphere(0.5, 20, 20);
 	glPopMatrix();
 
 	glPushMatrix(); //luna uno (lunau)
 	glRotatef(marte, 0, 1, 0);
 	glTranslatef(12.5, 0, 0);
-	glRotatef(marte, 0, 1, 0); 
+	glRotatef(marte, 0, 1, 0);
 	glColor3f(0.7, 0.7, 0.7);
-	glutSolidSphere(0.2, 20, 20); 
+	glutSolidSphere(0.2, 20, 20);
 	glPopMatrix();
 
 	glPushMatrix(); //jupiter
@@ -158,7 +186,7 @@ void display(void)   // Creamos la funcion donde se dibuja
 
 	glPopMatrix();
 
-	
+
 	glPushMatrix(); //saturno
 	glRotated(saturno, 0, 2, 0);
 	glTranslatef(22, 0, 0);
@@ -166,14 +194,14 @@ void display(void)   // Creamos la funcion donde se dibuja
 	glRotated(saturno, 0, 2, 0);
 	glPushMatrix();
 
-	glutSolidTorus(.1, 3, 10, 50);
+	glutSolidTorus(0.1, 3, 10, 50);
 
 	glPopMatrix();
 	glColor3f(1, 0.5, 0);
 	glutSolidSphere(1.8, 20, 20);
 	glPopMatrix();
 
-	
+
 	glPushMatrix(); //urano
 	glRotated(urano, 0, 2, 0);
 	glTranslatef(26, 0, 0);
@@ -325,7 +353,7 @@ int main(int argc, char** argv)   // Main Function
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
 	glutInitWindowSize(500, 500);	// Tamaño de la Ventana
 	glutInitWindowPosition(20, 60);	//Posicion de la Ventana
-	glutCreateWindow("Practica 6"); // Nombre de la Ventana
+	glutCreateWindow("Practica 7"); // Nombre de la Ventana
 	InitGL();						// Parametros iniciales de la aplicacion
 	glutDisplayFunc(display);  //Indicamos a Glut función de dibujo
 	glutReshapeFunc(reshape);	//Indicamos a Glut función en caso de cambio de tamano
